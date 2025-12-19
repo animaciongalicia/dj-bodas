@@ -1,0 +1,1912 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Diagnóstico de Fiesta | DJPONTE.COM</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #D4A574;
+            --gold-light: #E8C9A0;
+            --gold-dark: #B8956A;
+            --cream: #FDF8F3;
+            --cream-dark: #F5EDE3;
+            --charcoal: #2D2926;
+            --charcoal-light: #4A4543;
+            --rose: #C77D7D;
+            --rose-light: #E8B4B4;
+            --green: #7D9C7D;
+            --green-light: #A8C4A8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--cream);
+            color: var(--charcoal);
+            overflow-x: hidden;
+        }
+
+        /* ==================== WIZARD ==================== */
+        .wizard-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .wizard-wrapper.hidden {
+            display: none;
+        }
+
+        .wizard-container {
+            max-width: 500px;
+            width: 100%;
+            height: 90vh;
+            max-height: 680px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 20px 60px rgba(45, 41, 38, 0.12);
+            overflow: hidden;
+        }
+
+        .wizard-header {
+            padding: 8px 0 12px;
+            flex-shrink: 0;
+        }
+
+        .brand-logo {
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .brand-logo span {
+            color: var(--gold);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--cream-dark);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--gold), var(--gold-light));
+            transition: width 0.4s ease;
+        }
+
+        .step-indicator {
+            font-size: 11px;
+            color: var(--charcoal-light);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .screen {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            overflow-y: auto;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .screen-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(20px, 5vw, 26px);
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 8px;
+        }
+
+        .screen-title .highlight {
+            color: var(--rose);
+            font-style: italic;
+        }
+
+        .screen-subtitle {
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--charcoal-light);
+            margin-bottom: 16px;
+        }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: var(--charcoal);
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .btn-primary:hover {
+            background: var(--charcoal-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .wizard-nav {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+            flex-shrink: 0;
+        }
+
+        .wizard-nav .btn-primary {
+            margin-top: 0;
+        }
+
+        .btn-back {
+            background: transparent;
+            color: var(--charcoal);
+            border: 2px solid var(--cream-dark);
+            padding: 12px 16px;
+            flex: 0 0 auto;
+        }
+
+        .btn-back:hover {
+            background: var(--cream);
+            border-color: var(--charcoal-light);
+            transform: none;
+        }
+
+        .btn-next {
+            flex: 1;
+        }
+
+        .btn-restart {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: transparent;
+            color: var(--charcoal-light);
+            border: none;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 12px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-restart:hover {
+            color: var(--charcoal);
+        }
+
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+
+        .option-item {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .option-item input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: var(--cream);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .option-item:hover .option-label {
+            border-color: var(--gold-light);
+        }
+
+        .option-item input:checked + .option-label {
+            border-color: var(--gold);
+            background: white;
+        }
+
+        .option-icon {
+            width: 32px;
+            height: 32px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            flex-shrink: 0;
+        }
+
+        .option-text {
+            font-size: 13px;
+            font-weight: 500;
+            flex: 1;
+        }
+
+        .option-check {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--cream-dark);
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .option-item input:checked + .option-label .option-check {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .option-item.multi .option-check {
+            border-radius: 4px;
+        }
+
+        .slider-container {
+            margin: 12px 0;
+        }
+
+        .slider-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .slider {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: var(--cream-dark);
+            border-radius: 3px;
+        }
+
+        .slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--gold);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .slider-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--charcoal-light);
+            margin-top: 4px;
+        }
+
+        .slider-current {
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--gold-dark);
+            margin-top: 4px;
+        }
+
+        .tags-section {
+            margin-bottom: 12px;
+        }
+
+        .tags-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tags-input-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 10px;
+            background: var(--cream);
+            border: 2px solid transparent;
+            border-radius: 10px;
+            min-height: 44px;
+        }
+
+        .tags-input-wrapper:focus-within {
+            border-color: var(--gold);
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 14px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .tag.yes { background: var(--green-light); }
+        .tag.no { background: var(--rose-light); }
+
+        .tag-remove {
+            cursor: pointer;
+            opacity: 0.6;
+            font-size: 10px;
+        }
+
+        .tags-input {
+            border: none;
+            outline: none;
+            font-family: inherit;
+            font-size: 12px;
+            flex: 1;
+            min-width: 80px;
+            background: transparent;
+        }
+
+        .tags-hint {
+            font-size: 10px;
+            color: var(--charcoal-light);
+            margin-top: 4px;
+        }
+
+        .checkbox-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 6px;
+            margin: 10px 0;
+        }
+
+        .checkbox-item input {
+            position: absolute;
+            opacity: 0;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 10px;
+            background: var(--cream);
+            border: 2px solid transparent;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+
+        .checkbox-item input:checked + .checkbox-label {
+            border-color: var(--gold);
+            background: white;
+        }
+
+        .checkbox-box {
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--cream-dark);
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .checkbox-item input:checked + .checkbox-label .checkbox-box {
+            background: var(--gold);
+            border-color: var(--gold);
+        }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--cream-dark);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 13px;
+            background: var(--cream);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: white;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .trust-text {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: var(--charcoal-light);
+            margin-top: 8px;
+        }
+
+        .loading-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .loading-ring {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .loading-ring::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 4px solid var(--cream-dark);
+        }
+
+        .loading-ring::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 4px solid transparent;
+            border-top-color: var(--gold);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-percentage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .loading-message {
+            font-size: 13px;
+            color: var(--charcoal-light);
+        }
+
+        .micro-text {
+            font-size: 10px;
+            color: var(--charcoal-light);
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .micro-text span {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .micro-text span::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+        }
+
+        .benefit-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--cream-dark);
+        }
+
+        .benefit-item:last-child {
+            border-bottom: none;
+        }
+
+        .benefit-icon {
+            width: 32px;
+            height: 32px;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .benefit-text {
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .benefit-text strong {
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* ==================== INFORME ==================== */
+        .report-wrapper {
+            display: none;
+            min-height: 100vh;
+            background: var(--cream);
+        }
+
+        .report-wrapper.active {
+            display: block;
+        }
+
+        .report-hero {
+            background: linear-gradient(135deg, var(--charcoal) 0%, #3a3532 100%);
+            color: white;
+            padding: 30px 20px 50px;
+            text-align: center;
+        }
+
+        .report-logo {
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 1px;
+            margin-bottom: 24px;
+            opacity: 0.8;
+        }
+
+        .report-logo span {
+            color: var(--gold);
+        }
+
+        .report-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 16px;
+        }
+
+        .report-badge.low {
+            background: var(--green);
+        }
+
+        .report-badge.medium {
+            background: var(--gold);
+            color: var(--charcoal);
+        }
+
+        .report-badge.high {
+            background: var(--rose);
+        }
+
+        .report-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(26px, 6vw, 36px);
+            font-weight: 700;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        .report-hero p {
+            font-size: 15px;
+            opacity: 0.85;
+        }
+
+        .report-score-bar {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 24px;
+        }
+
+        .score-segment {
+            width: 36px;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(255,255,255,0.2);
+        }
+
+        .score-segment.filled {
+            background: var(--gold);
+        }
+
+        .score-segment.filled.danger {
+            background: var(--rose);
+        }
+
+        .report-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 16px;
+            transform: translateY(-30px);
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        }
+
+        .report-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+
+        .report-card-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--gold-light), var(--gold));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            flex-shrink: 0;
+        }
+
+        .report-card-icon.warning {
+            background: linear-gradient(135deg, var(--rose-light), var(--rose));
+        }
+
+        .report-card-icon.success {
+            background: linear-gradient(135deg, var(--green-light), var(--green));
+        }
+
+        .report-card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .report-card-subtitle {
+            font-size: 12px;
+            color: var(--charcoal-light);
+            margin-top: 2px;
+        }
+
+        .report-card-body {
+            font-size: 14px;
+            line-height: 1.7;
+            color: var(--charcoal-light);
+        }
+
+        .report-card-body strong {
+            color: var(--charcoal);
+        }
+
+        .report-card-body p {
+            margin-bottom: 12px;
+        }
+
+        .report-card-body p:last-child {
+            margin-bottom: 0;
+        }
+
+        .solution-box {
+            background: var(--cream);
+            border-radius: 10px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .solution-label {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--gold-dark);
+            margin-bottom: 8px;
+        }
+
+        .solution-box p {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--charcoal);
+            margin: 0;
+        }
+
+        .risk-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .risk-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: var(--cream);
+            border-radius: 10px;
+        }
+
+        .risk-item-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .risk-item-content {
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .risk-item-content strong {
+            display: block;
+            color: var(--charcoal);
+            margin-bottom: 2px;
+        }
+
+        .report-conclusion {
+            background: linear-gradient(135deg, var(--charcoal), var(--charcoal-light));
+            color: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .report-conclusion h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .report-conclusion p {
+            font-size: 14px;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+
+        .report-premium {
+            background: white;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            border: 2px solid var(--gold);
+            position: relative;
+        }
+
+        .premium-tag {
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            background: var(--gold);
+            color: var(--charcoal);
+            padding: 4px 12px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .report-premium h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            margin-bottom: 4px;
+            margin-top: 8px;
+        }
+
+        .premium-price {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gold-dark);
+            margin-bottom: 16px;
+        }
+
+        .premium-price span {
+            font-size: 14px;
+            font-weight: 400;
+            color: var(--charcoal-light);
+        }
+
+        .premium-list {
+            margin-bottom: 20px;
+        }
+
+        .premium-list-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .premium-list-item::before {
+            content: '✓';
+            color: var(--green);
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .report-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            padding: 16px;
+            border-radius: 50px;
+            font-family: inherit;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: none;
+            border: none;
+            transition: all 0.3s ease;
+        }
+
+        .report-btn-primary {
+            background: var(--charcoal);
+            color: white;
+        }
+
+        .report-btn-primary:hover {
+            background: var(--charcoal-light);
+            transform: translateY(-2px);
+        }
+
+        .report-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .report-whatsapp {
+            background: white;
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: inherit;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            margin-bottom: 16px;
+        }
+
+        .whatsapp-icon {
+            width: 50px;
+            height: 50px;
+            background: #25D366;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .whatsapp-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        .whatsapp-text h4 {
+            font-size: 15px;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .whatsapp-text p {
+            font-size: 13px;
+            color: var(--charcoal-light);
+        }
+
+        .report-footer {
+            text-align: center;
+            padding: 30px 20px 40px;
+            font-size: 12px;
+            color: var(--charcoal-light);
+        }
+
+        .report-footer a {
+            color: var(--gold-dark);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        /* Resumen de datos */
+        .data-summary {
+            background: var(--cream);
+            border-radius: 10px;
+            padding: 14px;
+            margin-bottom: 16px;
+        }
+
+        .data-summary-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--charcoal-light);
+            margin-bottom: 10px;
+        }
+
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .data-row:last-child {
+            border-bottom: none;
+        }
+
+        .data-row strong {
+            color: var(--charcoal);
+        }
+
+        /* Responsive */
+        @media (max-width: 500px) {
+            .wizard-container {
+                height: 100vh;
+                max-height: none;
+                border-radius: 0;
+            }
+
+            .wizard-wrapper {
+                padding: 0;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .checkbox-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .report-whatsapp {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==================== WIZARD ==================== -->
+    <div class="wizard-wrapper" id="wizardWrapper">
+        <div class="wizard-container">
+            <header class="wizard-header">
+                <div class="brand-logo">DJ<span>PONTE</span>.COM</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill" style="width: 10%"></div>
+                </div>
+                <div class="step-indicator" id="stepIndicator">Paso 1 de 10</div>
+            </header>
+
+            <!-- Pantalla 1: Dolor -->
+            <section class="screen active" id="screen1">
+                <h1 class="screen-title">Tu evento puede ser increíble… <span class="highlight">o acabar con la pista muerta.</span></h1>
+                <p class="screen-subtitle">La fiesta no falla por falta de ganas. Falla por falta de control musical.</p>
+                <div style="flex:1"></div>
+                <button class="btn-primary" onclick="nextScreen()">
+                    Quiero evitar un evento apagado
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </button>
+                <div class="micro-text">
+                    <span>3 minutos</span>
+                    <span>Resultado inmediato</span>
+                    <span>Galicia</span>
+                </div>
+            </section>
+
+            <!-- Pantalla 2: Beneficios -->
+            <section class="screen" id="screen2">
+                <h1 class="screen-title">En 3 minutos te digo el <span class="highlight">riesgo real</span></h1>
+                <div class="benefits-list" style="margin: 16px 0;">
+                    <div class="benefit-item">
+                        <div class="benefit-icon" style="width:40px;height:40px;font-size:18px;">📊</div>
+                        <div class="benefit-text" style="font-size:14px;"><strong style="font-size:15px;">Nivel de riesgo</strong>Bajo, medio o alto. Sin rodeos.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon" style="width:40px;height:40px;font-size:18px;">🔍</div>
+                        <div class="benefit-text" style="font-size:14px;"><strong style="font-size:15px;">Qué bloquea tu fiestón</strong>Y cómo arreglarlo.</div>
+                    </div>
+                    <div class="benefit-item">
+                        <div class="benefit-icon" style="width:40px;height:40px;font-size:18px;">🎧</div>
+                        <div class="benefit-text" style="font-size:14px;"><strong style="font-size:15px;">Recomendaciones</strong>Según tu evento y tus invitados.</div>
+                    </div>
+                </div>
+                <div style="flex:1"></div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="nextScreen()">
+                        Empezar diagnóstico
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                    </button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 3: Tipo de evento -->
+            <section class="screen" id="screen3">
+                <h1 class="screen-title">¿Qué tipo de <span class="highlight">evento</span> es?</h1>
+                <div class="options-list">
+                    <label class="option-item">
+                        <input type="radio" name="eventType" value="boda">
+                        <div class="option-label">
+                            <div class="option-icon">💒</div>
+                            <span class="option-text">Boda</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="eventType" value="cumple">
+                        <div class="option-label">
+                            <div class="option-icon">🎂</div>
+                            <span class="option-text">Cumpleaños / Aniversario</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="eventType" value="empresa">
+                        <div class="option-label">
+                            <div class="option-icon">🏢</div>
+                            <span class="option-text">Evento de empresa / Corporativo</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="eventType" value="graduacion">
+                        <div class="option-label">
+                            <div class="option-icon">🎓</div>
+                            <span class="option-text">Graduación / Fin de curso</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="eventType" value="comunion">
+                        <div class="option-label">
+                            <div class="option-icon">⛪</div>
+                            <span class="option-text">Comunión / Bautizo</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="eventType" value="otro">
+                        <div class="option-label">
+                            <div class="option-icon">🎉</div>
+                            <span class="option-text">Otro tipo de fiesta</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                </div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="nextScreen()">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 4: Miedo principal -->
+            <section class="screen" id="screen4">
+                <h1 class="screen-title">Lo que más te daría rabia es…</h1>
+                <div class="options-list">
+                    <label class="option-item">
+                        <input type="radio" name="fear" value="empty">
+                        <div class="option-label">
+                            <div class="option-icon">🪑</div>
+                            <span class="option-text">Pista vacía / gente sentada</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="fear" value="music">
+                        <div class="option-label">
+                            <div class="option-icon">🎵</div>
+                            <span class="option-text">Música que no nos representa</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="fear" value="dj">
+                        <div class="option-label">
+                            <div class="option-icon">🧊</div>
+                            <span class="option-text">DJ frío que va a lo suyo</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="fear" value="cuts">
+                        <div class="option-label">
+                            <div class="option-icon">⚡</div>
+                            <span class="option-text">Cortes / fallos técnicos</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="fear" value="requests">
+                        <div class="option-label">
+                            <div class="option-icon">📢</div>
+                            <span class="option-text">Que manden los invitados</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                </div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="nextScreen()">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 5: Tipo de invitados -->
+            <section class="screen" id="screen5">
+                <h1 class="screen-title">¿Cómo es tu mezcla de <span class="highlight">invitados</span>?</h1>
+                <div class="options-list">
+                    <label class="option-item">
+                        <input type="radio" name="guests" value="family">
+                        <div class="option-label">
+                            <div class="option-icon">👨‍👩‍👧‍👦</div>
+                            <span class="option-text">Muy familiar (muchas edades)</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="guests" value="mixed">
+                        <div class="option-label">
+                            <div class="option-icon">🎉</div>
+                            <span class="option-text">Mixta (familia + amigos)</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="guests" value="party">
+                        <div class="option-label">
+                            <div class="option-icon">🔥</div>
+                            <span class="option-text">Muy de fiesta (energía alta)</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                </div>
+                <div class="slider-container">
+                    <label class="slider-label">¿Cuántos invitados?</label>
+                    <input type="range" class="slider" id="guestCount" min="30" max="200" value="100" oninput="updateSlider()">
+                    <div class="slider-values"><span>30</span><span>200+</span></div>
+                    <div class="slider-current" id="sliderValue">~100 invitados</div>
+                </div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="nextScreen()">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 6: Estilos musicales -->
+            <section class="screen" id="screen6">
+                <h1 class="screen-title">Tu "SÍ o SÍ" y tu <span class="highlight">"PROHIBIDO"</span></h1>
+                <div class="tags-section">
+                    <label class="tags-label"><span>✅</span> Obligatorio en mi evento</label>
+                    <div class="tags-input-wrapper" id="yesTags">
+                        <input type="text" class="tags-input" id="yesInput" placeholder="Escribe y pulsa Enter..." onkeydown="addTag(event, 'yes')">
+                    </div>
+                    <div class="tags-hint">Ej: Reggaeton, Queen, Bachata...</div>
+                </div>
+                <div class="tags-section">
+                    <label class="tags-label"><span>🚫</span> Prohibido en mi evento</label>
+                    <div class="tags-input-wrapper" id="noTags">
+                        <input type="text" class="tags-input" id="noInput" placeholder="Escribe y pulsa Enter..." onkeydown="addTag(event, 'no')">
+                    </div>
+                    <div class="tags-hint">Ej: Cumbia, Heavy, ciertos temas...</div>
+                </div>
+                <div style="flex:1"></div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="nextScreen()">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 7: Control -->
+            <section class="screen" id="screen7">
+                <h1 class="screen-title">¿Controlar los <span class="highlight">momentos clave</span>?</h1>
+                <div class="options-list">
+                    <label class="option-item">
+                        <input type="radio" name="control" value="flow">
+                        <div class="option-label">
+                            <div class="option-icon">🌊</div>
+                            <span class="option-text">"Que fluya, sin agobios"</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="control" value="balanced">
+                        <div class="option-label">
+                            <div class="option-icon">⚖️</div>
+                            <span class="option-text">"Control moderado"</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                    <label class="option-item">
+                        <input type="radio" name="control" value="total">
+                        <div class="option-label">
+                            <div class="option-icon">🎯</div>
+                            <span class="option-text">"Todo atado al detalle"</span>
+                            <div class="option-check"></div>
+                        </div>
+                    </label>
+                </div>
+                <p style="font-size: 13px; font-weight: 600; margin-bottom: 8px;">Momentos importantes a coordinar:</p>
+                <div class="checkbox-grid">
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="entrada"><div class="checkbox-label"><div class="checkbox-box"></div>Entrada</div></label>
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="discursos"><div class="checkbox-label"><div class="checkbox-box"></div>Discursos</div></label>
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="baile"><div class="checkbox-label"><div class="checkbox-box"></div>Baile especial</div></label>
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="tarta"><div class="checkbox-label"><div class="checkbox-box"></div>Tarta / Brindis</div></label>
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="sorpresa"><div class="checkbox-label"><div class="checkbox-box"></div>Sorpresas</div></label>
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="juegos"><div class="checkbox-label"><div class="checkbox-box"></div>Juegos / Animación</div></label>
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="premios"><div class="checkbox-label"><div class="checkbox-box"></div>Premios / Regalos</div></label>
+                    <label class="checkbox-item"><input type="checkbox" name="moments" value="fin"><div class="checkbox-label"><div class="checkbox-box"></div>Fin de fiesta</div></label>
+                </div>
+                <div style="flex:1"></div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="nextScreen()">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 8: Datos contacto -->
+            <section class="screen" id="screen8">
+                <h1 class="screen-title">Te preparo el <span class="highlight">informe</span></h1>
+                <p class="screen-subtitle">Resultado + recomendaciones para tu evento.</p>
+                <div class="form-group">
+                    <label class="form-label">Tu nombre</label>
+                    <input type="text" class="form-input" id="userName" placeholder="¿Cómo te llamas?">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Tu email</label>
+                    <input type="email" class="form-input" id="userEmail" placeholder="ejemplo@email.com">
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label">Fecha evento</label>
+                        <input type="date" class="form-input" id="weddingDate">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Zona</label>
+                        <select class="form-input" id="weddingCity">
+                            <option value="">Selecciona...</option>
+                            <option value="coruna">A Coruña</option>
+                            <option value="santiago">Santiago</option>
+                            <option value="vigo">Vigo</option>
+                            <option value="pontevedra">Pontevedra</option>
+                            <option value="lugo">Lugo</option>
+                            <option value="ourense">Ourense</option>
+                            <option value="otro">Otra zona</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="trust-text">🔒 Cero spam. Solo tu informe.</div>
+                <div style="flex:1"></div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="nextScreen()">Siguiente <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 9: Sabotajes -->
+            <section class="screen" id="screen9">
+                <h1 class="screen-title">¿Quién puede <span class="highlight">sabotear</span> la música?</h1>
+                <div class="options-list">
+                    <label class="option-item multi"><input type="checkbox" name="sabotage" value="none"><div class="option-label"><div class="option-icon">✅</div><span class="option-text">Nadie, todo controlado</span><div class="option-check"></div></div></label>
+                    <label class="option-item multi"><input type="checkbox" name="sabotage" value="friends"><div class="option-label"><div class="option-icon">🎤</div><span class="option-text">Amigos pidiendo temas</span><div class="option-check"></div></div></label>
+                    <label class="option-item multi"><input type="checkbox" name="sabotage" value="family"><div class="option-label"><div class="option-icon">👵</div><span class="option-text">Familia imponiendo "lo suyo"</span><div class="option-check"></div></div></label>
+                    <label class="option-item multi"><input type="checkbox" name="sabotage" value="venue"><div class="option-label"><div class="option-icon">🏰</div><span class="option-text">Venue / horarios apretados</span><div class="option-check"></div></div></label>
+                    <label class="option-item multi"><input type="checkbox" name="sabotage" value="weather"><div class="option-label"><div class="option-icon">🌧️</div><span class="option-text">Plan B lluvia necesario</span><div class="option-check"></div></div></label>
+                </div>
+                <div style="flex:1"></div>
+                <div class="wizard-nav">
+                    <button class="btn-primary btn-back" onclick="prevScreen()">←</button>
+                    <button class="btn-primary btn-next" onclick="showLoading()">Calcular mi riesgo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+                </div>
+                <button class="btn-restart" onclick="restartWizard()">🔄 Empezar de nuevo</button>
+            </section>
+
+            <!-- Pantalla 10: Loading -->
+            <section class="screen" id="screen10">
+                <div class="loading-container">
+                    <div class="loading-ring">
+                        <span class="loading-percentage" id="loadingPercent">0%</span>
+                    </div>
+                    <h2 style="font-size: 18px; margin-bottom: 8px;">Calculando tu riesgo…</h2>
+                    <p class="loading-message" id="loadingMessage">Analizando perfil de invitados...</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- ==================== INFORME ==================== -->
+    <div class="report-wrapper" id="reportWrapper">
+        <div class="report-hero">
+            <div class="report-logo">DJ<span>PONTE</span>.COM</div>
+            <div class="report-badge medium" id="reportBadge">⚠️ Riesgo Medio</div>
+            <h1 id="reportTitle">Tu Diagnóstico de Fiesta</h1>
+            <p id="reportSubtitle">Análisis personalizado para tu boda</p>
+            <div class="report-score-bar" id="reportScoreBar"></div>
+        </div>
+
+        <div class="report-container" id="reportContent">
+            <!-- Se genera dinámicamente -->
+        </div>
+    </div>
+
+    <script>
+        var currentScreen = 1;
+        var totalScreens = 10;
+        var wizardData = {
+            eventType: '',
+            fear: '',
+            guests: '',
+            guestCount: 100,
+            yesTags: [],
+            noTags: [],
+            control: '',
+            moments: [],
+            name: '',
+            email: '',
+            eventDate: '',
+            city: '',
+            sabotage: []
+        };
+
+        function updateProgress() {
+            var progress = (currentScreen / totalScreens) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('stepIndicator').textContent = 'Paso ' + currentScreen + ' de ' + totalScreens;
+        }
+
+        function nextScreen() {
+            saveCurrentData();
+            document.getElementById('screen' + currentScreen).classList.remove('active');
+            currentScreen++;
+            document.getElementById('screen' + currentScreen).classList.add('active');
+            updateProgress();
+        }
+
+        function prevScreen() {
+            if (currentScreen > 1) {
+                document.getElementById('screen' + currentScreen).classList.remove('active');
+                currentScreen--;
+                document.getElementById('screen' + currentScreen).classList.add('active');
+                updateProgress();
+            }
+        }
+
+        function restartWizard() {
+            // Resetear datos
+            wizardData = {
+                eventType: '',
+                fear: '',
+                guests: '',
+                guestCount: 100,
+                yesTags: [],
+                noTags: [],
+                control: '',
+                moments: [],
+                name: '',
+                email: '',
+                eventDate: '',
+                city: '',
+                sabotage: []
+            };
+
+            // Limpiar formularios
+            var radios = document.querySelectorAll('input[type="radio"]');
+            for (var i = 0; i < radios.length; i++) {
+                radios[i].checked = false;
+            }
+            var checkboxes = document.querySelectorAll('input[type="checkbox"]');
+            for (var j = 0; j < checkboxes.length; j++) {
+                checkboxes[j].checked = false;
+            }
+            document.getElementById('guestCount').value = 100;
+            document.getElementById('sliderValue').textContent = '~100 invitados';
+            document.getElementById('userName').value = '';
+            document.getElementById('userEmail').value = '';
+            document.getElementById('weddingDate').value = '';
+            document.getElementById('weddingCity').value = '';
+
+            // Limpiar tags
+            var yesTags = document.getElementById('yesTags');
+            var noTags = document.getElementById('noTags');
+            var tags = yesTags.querySelectorAll('.tag');
+            for (var k = 0; k < tags.length; k++) {
+                tags[k].remove();
+            }
+            tags = noTags.querySelectorAll('.tag');
+            for (var l = 0; l < tags.length; l++) {
+                tags[l].remove();
+            }
+
+            // Volver a pantalla 1
+            document.getElementById('screen' + currentScreen).classList.remove('active');
+            currentScreen = 1;
+            document.getElementById('screen1').classList.add('active');
+            updateProgress();
+        }
+
+        function saveCurrentData() {
+            var el;
+            switch(currentScreen) {
+                case 3:
+                    el = document.querySelector('input[name="eventType"]:checked');
+                    wizardData.eventType = el ? el.value : 'otro';
+                    break;
+                case 4:
+                    el = document.querySelector('input[name="fear"]:checked');
+                    wizardData.fear = el ? el.value : 'empty';
+                    break;
+                case 5:
+                    el = document.querySelector('input[name="guests"]:checked');
+                    wizardData.guests = el ? el.value : 'mixed';
+                    wizardData.guestCount = parseInt(document.getElementById('guestCount').value) || 100;
+                    break;
+                case 7:
+                    el = document.querySelector('input[name="control"]:checked');
+                    wizardData.control = el ? el.value : 'balanced';
+                    var moments = document.querySelectorAll('input[name="moments"]:checked');
+                    wizardData.moments = [];
+                    for (var i = 0; i < moments.length; i++) {
+                        wizardData.moments.push(moments[i].value);
+                    }
+                    break;
+                case 8:
+                    wizardData.name = document.getElementById('userName').value || '';
+                    wizardData.email = document.getElementById('userEmail').value || '';
+                    wizardData.eventDate = document.getElementById('weddingDate').value || '';
+                    wizardData.city = document.getElementById('weddingCity').value || '';
+                    break;
+                case 9:
+                    var sabs = document.querySelectorAll('input[name="sabotage"]:checked');
+                    wizardData.sabotage = [];
+                    for (var j = 0; j < sabs.length; j++) {
+                        wizardData.sabotage.push(sabs[j].value);
+                    }
+                    break;
+            }
+        }
+
+        function updateSlider() {
+            var value = document.getElementById('guestCount').value;
+            document.getElementById('sliderValue').textContent = (value >= 200 ? '200+' : '~' + value) + ' invitados';
+        }
+
+        function addTag(event, type) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                var input = event.target;
+                var value = input.value.trim();
+                if (value) {
+                    var arr = type === 'yes' ? wizardData.yesTags : wizardData.noTags;
+                    if (arr.length < 3) {
+                        arr.push(value);
+                        var container = document.getElementById(type + 'Tags');
+                        var tag = document.createElement('span');
+                        tag.className = 'tag ' + type;
+                        tag.innerHTML = value + ' <span class="tag-remove" onclick="removeTag(this,\'' + type + '\',\'' + value + '\')">✕</span>';
+                        container.insertBefore(tag, input);
+                        input.value = '';
+                    }
+                }
+            }
+        }
+
+        function removeTag(el, type, value) {
+            var arr = type === 'yes' ? wizardData.yesTags : wizardData.noTags;
+            var idx = arr.indexOf(value);
+            if (idx > -1) arr.splice(idx, 1);
+            el.parentElement.remove();
+        }
+
+        function showLoading() {
+            saveCurrentData();
+            document.getElementById('screen' + currentScreen).classList.remove('active');
+            currentScreen = 10;
+            document.getElementById('screen10').classList.add('active');
+            updateProgress();
+
+            var percent = 0;
+            var messages = ["Analizando invitados...", "Evaluando riesgos...", "Preparando informe..."];
+            var msgIdx = 0;
+
+            var interval = setInterval(function() {
+                percent += Math.random() * 20;
+                if (percent >= 100) {
+                    percent = 100;
+                    clearInterval(interval);
+                    setTimeout(showReport, 300);
+                }
+                document.getElementById('loadingPercent').textContent = Math.floor(percent) + '%';
+                if (percent > (msgIdx + 1) * 33 && msgIdx < 2) {
+                    msgIdx++;
+                    document.getElementById('loadingMessage').textContent = messages[msgIdx];
+                }
+            }, 150);
+        }
+
+        function showReport() {
+            // Ocultar wizard, mostrar informe
+            document.getElementById('wizardWrapper').classList.add('hidden');
+            document.getElementById('reportWrapper').classList.add('active');
+            window.scrollTo(0, 0);
+
+            // Calcular riesgo
+            var score = 0;
+            
+            if (wizardData.guests === 'family') score += 25;
+            else if (wizardData.guests === 'mixed') score += 15;
+            else score += 5;
+
+            if (wizardData.guestCount > 150) score += 15;
+            else if (wizardData.guestCount > 100) score += 8;
+
+            if (wizardData.control === 'flow') score += 20;
+            else if (wizardData.control === 'balanced') score += 10;
+
+            var sabCount = 0;
+            for (var i = 0; i < wizardData.sabotage.length; i++) {
+                if (wizardData.sabotage[i] !== 'none') sabCount++;
+            }
+            score += sabCount * 10;
+
+            if (wizardData.fear === 'empty' || wizardData.fear === 'cuts') score += 8;
+
+            if (score < 15) score = 20;
+
+            var level, levelClass, emoji;
+            if (score < 35) {
+                level = 'Riesgo Bajo';
+                levelClass = 'low';
+                emoji = '✅';
+            } else if (score < 55) {
+                level = 'Riesgo Medio';
+                levelClass = 'medium';
+                emoji = '⚠️';
+            } else {
+                level = 'Riesgo Alto';
+                levelClass = 'high';
+                emoji = '🚨';
+            }
+
+            // Actualizar hero
+            var badge = document.getElementById('reportBadge');
+            badge.className = 'report-badge ' + levelClass;
+            badge.textContent = emoji + ' ' + level;
+
+            var eventTypeName = getEventTypeName(wizardData.eventType);
+            document.getElementById('reportTitle').textContent = wizardData.name ? 'Diagnóstico de ' + wizardData.name : 'Tu Diagnóstico de Fiesta';
+            document.getElementById('reportSubtitle').textContent = eventTypeName + ' · ' + wizardData.guestCount + ' invitados' + (wizardData.city ? ' · ' + getCityName(wizardData.city) : '');
+
+            // Score bar
+            var barHtml = '';
+            var filled = Math.ceil(score / 20);
+            for (var b = 0; b < 5; b++) {
+                var cls = b < filled ? 'filled' : '';
+                if (cls && levelClass === 'high') cls += ' danger';
+                barHtml += '<div class="score-segment ' + cls + '"></div>';
+            }
+            document.getElementById('reportScoreBar').innerHTML = barHtml;
+
+            // Generar contenido
+            generateReportContent(score, levelClass);
+        }
+
+        function getCityName(code) {
+            var cities = {coruna:'A Coruña',santiago:'Santiago',vigo:'Vigo',pontevedra:'Pontevedra',lugo:'Lugo',ourense:'Ourense',otro:'Galicia'};
+            return cities[code] || 'Galicia';
+        }
+
+        function getEventTypeName(code) {
+            var types = {
+                boda: 'Boda',
+                cumple: 'Cumpleaños / Aniversario',
+                empresa: 'Evento corporativo',
+                graduacion: 'Graduación',
+                comunion: 'Comunión / Bautizo',
+                otro: 'Evento'
+            };
+            return types[code] || 'Evento';
+        }
+
+        function generateReportContent(score, level) {
+            var html = '';
+            var eventTypeName = getEventTypeName(wizardData.eventType);
+
+            // Resumen de datos
+            html += '<div class="data-summary">';
+            html += '<div class="data-summary-title">📋 Resumen de tu evento</div>';
+            html += '<div class="data-row"><span>Tipo</span><strong>' + eventTypeName + '</strong></div>';
+            html += '<div class="data-row"><span>Invitados</span><strong>' + wizardData.guestCount + ' personas</strong></div>';
+            html += '<div class="data-row"><span>Perfil</span><strong>' + getGuestsLabel(wizardData.guests) + '</strong></div>';
+            html += '<div class="data-row"><span>Control deseado</span><strong>' + getControlLabel(wizardData.control) + '</strong></div>';
+            if (wizardData.yesTags.length > 0) {
+                html += '<div class="data-row"><span>Música SÍ</span><strong>' + wizardData.yesTags.join(', ') + '</strong></div>';
+            }
+            if (wizardData.noTags.length > 0) {
+                html += '<div class="data-row"><span>Música NO</span><strong>' + wizardData.noTags.join(', ') + '</strong></div>';
+            }
+            html += '</div>';
+
+            // Tarjeta 1: Miedo principal
+            var fearData = getFearData(wizardData.fear || 'empty');
+            html += '<div class="report-card">';
+            html += '<div class="report-card-header">';
+            html += '<div class="report-card-icon">' + fearData.icon + '</div>';
+            html += '<div><div class="report-card-title">' + fearData.title + '</div>';
+            html += '<div class="report-card-subtitle">Tu mayor preocupación</div></div>';
+            html += '</div>';
+            html += '<div class="report-card-body">';
+            html += '<p><strong>El problema:</strong> ' + fearData.problem + '</p>';
+            html += '<div class="solution-box">';
+            html += '<div class="solution-label">💡 Cómo lo soluciona DJPONTE</div>';
+            html += '<p>' + fearData.solution + '</p>';
+            html += '</div></div></div>';
+
+            // Tarjeta 2: Perfil de invitados
+            var guestsData = getGuestsData(wizardData.guests || 'mixed', wizardData.guestCount);
+            html += '<div class="report-card">';
+            html += '<div class="report-card-header">';
+            html += '<div class="report-card-icon">' + guestsData.icon + '</div>';
+            html += '<div><div class="report-card-title">' + guestsData.title + '</div>';
+            html += '<div class="report-card-subtitle">' + wizardData.guestCount + ' invitados</div></div>';
+            html += '</div>';
+            html += '<div class="report-card-body">';
+            html += '<p><strong>Análisis:</strong> ' + guestsData.analysis + '</p>';
+            html += '<div class="solution-box">';
+            html += '<div class="solution-label">🎧 Estrategia musical DJPONTE</div>';
+            html += '<p>' + guestsData.strategy + '</p>';
+            html += '</div></div></div>';
+
+            // Tarjeta 3: Factores de riesgo
+            var risks = getRisks(wizardData.sabotage);
+            if (risks.length > 0) {
+                html += '<div class="report-card">';
+                html += '<div class="report-card-header">';
+                html += '<div class="report-card-icon warning">⚠️</div>';
+                html += '<div><div class="report-card-title">Factores de riesgo detectados</div>';
+                html += '<div class="report-card-subtitle">' + risks.length + ' punto' + (risks.length > 1 ? 's' : '') + ' a gestionar</div></div>';
+                html += '</div>';
+                html += '<div class="risk-list">';
+                for (var r = 0; r < risks.length; r++) {
+                    html += '<div class="risk-item">';
+                    html += '<div class="risk-item-icon">' + risks[r].icon + '</div>';
+                    html += '<div class="risk-item-content"><strong>' + risks[r].title + '</strong>' + risks[r].solution + '</div>';
+                    html += '</div>';
+                }
+                html += '</div></div>';
+            }
+
+            // Conclusión
+            var conclusion = getConclusion(level);
+            html += '<div class="report-conclusion">';
+            html += '<h3>' + conclusion.emoji + ' ' + conclusion.title + '</h3>';
+            html += '<p>' + conclusion.text + '</p>';
+            html += '</div>';
+
+            // Pack Premium
+            html += '<div class="report-premium">';
+            html += '<div class="premium-tag">⭐ Recomendado</div>';
+            html += '<h3>Pack Fiestón DJPONTE</h3>';
+            html += '<div class="premium-price">Desde 450€ <span>· Todo incluido</span></div>';
+            html += '<div class="premium-list">';
+            html += '<div class="premium-list-item">Reunión previa para cerrar tu guion musical personalizado</div>';
+            html += '<div class="premium-list-item">Equipo profesional de sonido e iluminación</div>';
+            html += '<div class="premium-list-item">Gestión completa de momentos clave y transiciones</div>';
+            html += '<div class="premium-list-item">Protocolo "anti-cuñados" para gestionar peticiones</div>';
+            html += '<div class="premium-list-item">Plan B meteorológico: cambio interior/exterior en 15 min</div>';
+            html += '<div class="premium-list-item">Coordinación con fotógrafo, venue y proveedores</div>';
+            html += '</div>';
+            html += '<a href="https://djponte.com/bodas" class="report-btn report-btn-primary">Ver Pack Completo <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg></a>';
+            html += '</div>';
+
+            // WhatsApp
+            html += '<a href="https://wa.me/34600000000?text=Hola!%20Acabo%20de%20hacer%20el%20diagnóstico%20de%20fiesta%20en%20DJPONTE.%20Mi%20nombre%20es%20' + encodeURIComponent(wizardData.name || 'cliente') + '%20y%20quiero%20consultar%20disponibilidad." class="report-whatsapp">';
+            html += '<div class="whatsapp-icon"><svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>';
+            html += '<div class="whatsapp-text"><h4>Consultar disponibilidad 2025/2026</h4><p>1 minuto · Te confirmo si tu fecha está libre</p></div>';
+            html += '</a>';
+
+            // Footer
+            html += '<div class="report-footer">';
+            html += '<p>Diagnóstico generado por <a href="https://djponte.com">DJPONTE.COM</a></p>';
+            html += '<p style="margin-top:6px;opacity:0.7;">+200 bodas en Galicia · Tu fiesta, nuestra pasión</p>';
+            html += '</div>';
+
+            document.getElementById('reportContent').innerHTML = html;
+        }
+
+        function getGuestsLabel(g) {
+            if (g === 'family') return 'Muy familiar';
+            if (g === 'party') return 'Muy fiestero';
+            return 'Mixto (familia + amigos)';
+        }
+
+        function getControlLabel(c) {
+            if (c === 'flow') return 'Que fluya';
+            if (c === 'total') return 'Todo controlado';
+            return 'Control moderado';
+        }
+
+        function getFearData(fear) {
+            var data = {
+                empty: {
+                    icon: '🪑',
+                    title: 'Pista vacía / gente sentada',
+                    problem: 'El 70% de los eventos con "pista muerta" fallan en los primeros 20 minutos. Si el arranque no engancha, la gente se acomoda en las sillas y luego cuesta el doble levantarla. Es un efecto dominó: si los primeros no se animan, los demás tampoco lo harán.',
+                    solution: 'Usamos el "Método 3-2-1": 3 temas reconocibles para romper el hielo (esos que todo el mundo tararea sin darse cuenta), 2 clásicos multigeneracionales que conectan a todos, y 1 bombazo calculado para el primer pico de energía. El arranque está diseñado para que NADIE se quede sentado.'
+                },
+                music: {
+                    icon: '🎵',
+                    title: 'Música que no os representa',
+                    problem: 'Un DJ plantilla pone lo mismo en todos los eventos: el mismo reggaetón, la misma bachata, los mismos éxitos de siempre. Resultado: os sentís como invitados en vuestro propio evento. La gente baila, sí, pero no es VUESTRA fiesta. Y eso no tiene arreglo después.',
+                    solution: 'Hacemos una reunión previa donde cerramos vuestro "ADN musical": los SÍ absolutos, los NO rotundos, y los momentos clave con su banda sonora perfecta. Eso no se improvisa, se planifica. Cada evento suena diferente porque cada cliente lo es.'
+                },
+                dj: {
+                    icon: '🧊',
+                    title: 'DJ frío que va a lo suyo',
+                    problem: 'Un DJ que no lee la pista es como un piloto que no mira los instrumentos. Puede ir técnicamente bien y estrellarse igual. Pone su playlist, mira el móvil, y cuando la pista se vacía... sigue a lo suyo. No hay comunicación, no hay ajustes, no hay conexión con lo que está pasando.',
+                    solution: 'No solo pinchamos: coordinamos con el venue los tiempos de servicio, gestionamos las pausas, y ajustamos la energía según cómo responde la pista en tiempo real. Si vemos que los mayores se van, bajamos dos marchas. Si vemos que los jóvenes se aburren, subimos la intensidad. DJ + director de orquesta.'
+                },
+                cuts: {
+                    icon: '⚡',
+                    title: 'Cortes y fallos técnicos',
+                    problem: 'Cortes de luz, problemas de sonido, transiciones bruscas, el micro que pita, la canción que se para a medias... Cada "accidente" técnico rompe el ambiente y cuesta 15 minutos recuperar la energía. En un evento de 5 horas, 3 cortes pueden arruinar completamente la noche.',
+                    solution: 'Llevamos equipo de backup completo (segundo portátil, cables de repuesto, sistema de sonido redundante), hacemos prueba de sonido 2 horas antes del evento, y tenemos protocolo de emergencia probado en +200 eventos. Si algo puede fallar, ya está previsto. Y si pasa algo imprevisto, tenemos un plan B que los invitados ni notarán.'
+                },
+                requests: {
+                    icon: '📢',
+                    title: 'Que manden los invitados',
+                    problem: 'El pesado que quiere reggaetón a destiempo, el que insiste con "pon algo bailable de verdad", el amigo que pide 15 veces su canción... Si el DJ cede a todas las peticiones, la fiesta se convierte en un caos sin hilo conductor y vosotros perdéis el control.',
+                    solution: 'Tenemos el "Protocolo Anti-Pesados": antes del evento, vosotros decidís qué tipo de peticiones se aceptan (ninguna, solo organizadores, todas pero filtradas por nosotros), y gestionamos a los insistentes con elegancia y firmeza. "Lo apunto para después" funciona mejor que "no puedo". Vosotros mandáis, nosotros ejecutamos y protegemos vuestra fiesta.'
+                }
+            };
+            return data[fear] || data.empty;
+        }
+
+        function getGuestsData(guests, count) {
+            var data = {
+                family: {
+                    icon: '👨‍👩‍👧‍👦',
+                    title: 'Evento muy familiar',
+                    analysis: 'Tienes muchas generaciones: mayores, adultos, jóvenes y niños. El reto no es poner música que guste a alguien, es conseguir que TODOS tengan su momento sin que nadie se aburra ni se vaya pronto. Los mayores no aguantan reggaetón 2 horas, pero los jóvenes no quieren pasodobles toda la noche.',
+                    strategy: 'Usamos "Bloques Generacionales": empezamos con 20-25 minutos para los mayores (clásicos, esos temas que les hacen sentir que la fiesta es también para ellos), transición con éxitos universales (ABBA, Queen, hits atemporales), y subida progresiva hacia música actual para los jóvenes. Los mayores ya bailaron "lo suyo" y se pueden retirar contentos. Los jóvenes tienen su momento de caña sin esperar 3 horas. Todos ganan.'
+                },
+                mixed: {
+                    icon: '🎉',
+                    title: 'Evento mixto equilibrado',
+                    analysis: 'Tienes el mejor escenario posible: familia que quiere disfrutar + amigos con ganas de fiesta. Pero también el más delicado de gestionar. Si te pasas con el reggaetón, los mayores se van pronto. Si te pasas con los clásicos, los jóvenes se aburren esperando. El equilibrio es un arte.',
+                    strategy: 'Aplicamos el "Método Puente": canciones que conectan generaciones naturalmente (ABBA, Michael Jackson, Queen, temazos de los 2000 que todos conocen) + momentos de energía alta para los fiesteros + pausas estratégicas (baladas, temas más suaves) para que los mayores descansen sin sentir que se tienen que ir. La clave está en las transiciones: nunca pasar de clásico a perreo en seco.'
+                },
+                party: {
+                    icon: '🔥',
+                    title: 'Evento fiesta total',
+                    analysis: 'Tu grupo viene con las pilas cargadas y ganas de guerra. Eso es genial, pero el riesgo no es que no bailen (van a bailar seguro), es que se descontrolen demasiado pronto. Si a las 23:00 ya están en modo discoteca total, a las 2:00 no queda gasolina. Y los últimos recuerdos serán "el evento que se apagó al final".',
+                    strategy: 'Control de energía profesional: arrancamos fuerte pero con techo controlado, gestionamos los picos de intensidad (no todo puede ser bombazo tras bombazo), y guardamos los "temazos nucleares" para el momento justo. La fiesta tiene que ser una montaña rusa con subidas y bajadas calculadas, no una línea recta a tope que agota. Objetivo: que dure 6 horas a tope, no 3 horas explosivas seguidas de 3 de bajón.'
+                }
+            };
+            return data[guests] || data.mixed;
+        }
+
+        function getRisks(sabotage) {
+            var risks = [];
+            var info = {
+                friends: {icon: '🎤', title: 'Amigos pidiendo temas sin parar', solution: 'Protocolo de peticiones definido antes del evento. Vosotros decidís qué se acepta y qué no. Nosotros gestionamos con elegancia.'},
+                family: {icon: '👵', title: 'Familia imponiendo "lo de siempre"', solution: 'Incluimos un bloque específico para ellos en el momento adecuado (normalmente al principio). Bailan lo suyo, se sienten respetados, y no secuestran el resto de la fiesta.'},
+                venue: {icon: '🏰', title: 'Venue con horarios complicados', solution: 'Coordinación previa con el local. Tiempos cerrados con el equipo del venue, sin improvisaciones de última hora. Sabemos exactamente cuándo bajar volumen, cuándo parar, cuándo cambiar de sala.'},
+                weather: {icon: '🌧️', title: 'Plan B meteorológico necesario', solution: 'Equipo preparado para funcionar en interior Y exterior. Cambio de ubicación completo en 15 minutos si hace falta. En Galicia, esto no es opcional: es obligatorio.'}
+            };
+            for (var i = 0; i < sabotage.length; i++) {
+                if (sabotage[i] !== 'none' && info[sabotage[i]]) {
+                    risks.push(info[sabotage[i]]);
+                }
+            }
+            return risks;
+        }
+
+        function getConclusion(level) {
+            var data = {
+                low: {
+                    emoji: '✅',
+                    title: 'Vas muy bien encaminado/a',
+                    text: 'Tu evento tiene los ingredientes correctos para un fiestón memorable. Tienes claro lo que quieres, tu mezcla de invitados es manejable, y los factores de riesgo están controlados. Lo que necesitas ahora es un DJ profesional que entienda tu visión y la ejecute sin fisuras.'
+                },
+                medium: {
+                    emoji: '⚠️',
+                    title: 'Hay trabajo que hacer, pero se arregla',
+                    text: 'Tienes algunos puntos que pueden complicar la fiesta si no se gestionan bien. La buena noticia: todo tiene solución con planificación anticipada. Una reunión previa para cerrar el guion musical, definir los momentos clave y establecer protocolos claros marca la diferencia entre "estuvo bien" y "fue el mejor evento del año".'
+                },
+                high: {
+                    emoji: '🚨',
+                    title: 'Necesitas actuar ya',
+                    text: 'Tu combinación de factores es la receta clásica de "evento que parecía que iba bien y de repente se torció". No te lo decimos para asustarte, te lo decimos para que actúes. Con el DJ adecuado, un plan bien cerrado y coordinación profesional, esto se arregla completamente. Sin ello, es jugar a la ruleta rusa con tu día importante.'
+                }
+            };
+            return data[level] || data.medium;
+        }
+
+        updateProgress();
+    </script>
+</body>
+</html>
